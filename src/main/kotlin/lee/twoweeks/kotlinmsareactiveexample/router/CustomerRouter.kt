@@ -1,7 +1,6 @@
 package lee.twoweeks.kotlinmsareactiveexample.router
 
 import lee.twoweeks.kotlinmsareactiveexample.handler.CustomerHandler
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -19,9 +18,11 @@ class CustomerRouter(private val customerHandler: CustomerHandler) {
         "/functional".nest {
             "/customer".nest {
                 GET("/{id}", customerHandler::get)
-//                {
-//                    customerHandler.get(it)
-//                }
+                POST("/", customerHandler::create)
+            }
+
+            "customers".nest {
+                GET("/", customerHandler::search)
             }
         }
     }
