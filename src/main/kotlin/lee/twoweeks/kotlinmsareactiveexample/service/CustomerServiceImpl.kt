@@ -1,6 +1,7 @@
 package lee.twoweeks.kotlinmsareactiveexample.service
 
 import lee.twoweeks.kotlinmsareactiveexample.model.Customer
+import lee.twoweeks.kotlinmsareactiveexample.model.CustomerExistException
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -29,9 +30,13 @@ class CustomerServiceImpl : CustomerService {
     }
 
     override fun createCustomer(customerMono: Mono<Customer>): Mono<Customer> {
-        return customerMono.map{
-            customers[it.id] = it
-            it
+        return customerMono.flatMap{
+            if (customers[it.id] == null) {
+                customers[it.id] = it
+                it.toMono()
+            } else {
+                Mono.error(CustomerExistException("Customer ${it.id} already exists"));
+            }
         }
     }
 }

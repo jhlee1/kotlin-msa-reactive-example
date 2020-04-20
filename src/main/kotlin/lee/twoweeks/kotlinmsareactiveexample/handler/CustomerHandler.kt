@@ -1,9 +1,11 @@
 package lee.twoweeks.kotlinmsareactiveexample.handler
 
+import lee.twoweeks.kotlinmsareactiveexample.dto.response.ErrorResponse
 import lee.twoweeks.kotlinmsareactiveexample.model.Customer
 import lee.twoweeks.kotlinmsareactiveexample.service.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters.fromObject
 import org.springframework.web.reactive.function.BodyInserters.fromValue
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -22,7 +24,7 @@ import java.net.URI
 class CustomerHandler(val customerService: CustomerService) {
     fun get(serverRequest: ServerRequest) : Mono<ServerResponse> =
             ok().body(customerService.getCustomer(serverRequest.pathVariable("id").toInt())
-                    .flatMap { ok().body(fromValue(it)) }
+                    .flatMap { ok().body(fromValue(it)) } //TODO: Jackson Parser 문제 해결 필요
                     .switchIfEmpty(notFound().build()))
 
     fun search(serverRequest: ServerRequest) = ok()
@@ -35,5 +37,8 @@ class CustomerHandler(val customerService: CustomerService) {
     fun create(serverRequest: ServerRequest) =
             customerService.createCustomer(serverRequest.bodyToMono())
                     .flatMap { created(URI.create("/functional/customer/${it.id}")).build() }
+                    .onErrorResume(Exception::class.java) {
+                        badRequest().body(fromValue(ErrorResponse("Error creating customer", it.message ?: "error")))
+                    }
 }
 
