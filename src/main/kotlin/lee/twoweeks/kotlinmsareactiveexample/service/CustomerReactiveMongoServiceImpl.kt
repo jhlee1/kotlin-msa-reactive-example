@@ -19,4 +19,7 @@ class CustomerReactiveMongoServiceImpl : CustomerReactiveMongoService {
     lateinit var customerRepository: CustomerRepository
 
     override fun getCustomer(id: Int): Mono<Customer> = customerRepository.findById(id)
+    override fun createCustomer(customer: Mono<Customer>): Mono<Customer> = customerRepository.create(customer)
+    override fun deleteCustomer(id: Int): Mono<Boolean> = customerRepository.deleteById(id).map { it.deletedCount > 0 }
+    override fun searchCustomers(nameFilter: String): Flux<Customer> = customerRepository.findCustomer(nameFilter)
 }
