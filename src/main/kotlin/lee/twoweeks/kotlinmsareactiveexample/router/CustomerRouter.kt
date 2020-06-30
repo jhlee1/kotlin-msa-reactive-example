@@ -1,29 +1,27 @@
 package lee.twoweeks.kotlinmsareactiveexample.router
 
-import lee.twoweeks.kotlinmsareactiveexample.handler.CustomerHandler
+import lee.twoweeks.kotlinmsareactiveexample.handler.CustomerRequestHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.router
 
 /**
- * Created by Joohan Lee on 2020/04/13
+ * Created by Joohan Lee on 2020/04/21
  *
  */
 
 @Component
-class CustomerRouter(private val customerHandler: CustomerHandler) {
+class CustomerRouter(val customerRequestHandler: CustomerRequestHandler) {
     @Bean
     fun customerRoutes(): RouterFunction<*> = router {
-        "/functional".nest {
-            "/customer".nest {
-                GET("/{id}", customerHandler::get)
-                POST("/", customerHandler::create)
-            }
-
-            "customers".nest {
-                GET("/", customerHandler::search)
-            }
+        "/customer".nest {
+            GET("/{id}", customerRequestHandler::get)
+            POST("/", customerRequestHandler::create)
+            DELETE("/{id}", customerRequestHandler::delete)
+        }
+        "/customers".nest {
+            GET("/", customerRequestHandler::search)
         }
     }
 }

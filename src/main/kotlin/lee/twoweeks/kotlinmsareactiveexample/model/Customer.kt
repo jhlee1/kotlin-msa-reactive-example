@@ -1,8 +1,33 @@
 package lee.twoweeks.kotlinmsareactiveexample.model
 
+import lombok.Getter
+import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("Customers")
-data class Customer(var id: Int = 0, val name: String = "", val telephone: Telephone? = null) {
-    data class Telephone(var countryCode: String = "", var telephoneNumber: String = "")
+@Document("customers")
+class Customer {
+    @Id
+    private lateinit var id : ObjectId
+
+    private var name : String
+    private var email : String
+
+    constructor(name: String, email: String) {
+        this.name = name;
+        this.email = email
+    }
+
+
+    fun getId() :String {
+        return id.toHexString()
+    }
+
+    fun getName() :String {
+        return name
+    }
+
+    fun getEmail() :String {
+        return email
+    }
 }
